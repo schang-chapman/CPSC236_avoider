@@ -5,20 +5,45 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     public float speed = 10f;
+    public float speedUpDuration = 1.5f;
+    private float speedUpTime = 0f;
+    private bool isSpeeding = false;
+    private bool hasSpedUp = false;
+
+    public float clickDelay = 0.5f;
+    private float lastClick;
+    private float clickTime;
 
     private Vector3 lastClickedPos;
     private bool isMoving;
     private Rigidbody2D rb;
 
-    void Update()
+    public GameObject treasure;
+    private bool hasTreasure = false;
+
+    void FixedUpdate()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            SetMousePosition();
+            clickTime = Time.time - lastClick;
+            if (clickTime < clickDelay)
+            {
+                isSpeeding = true;
+            } else
+            {
+                SetMousePosition();
+            }
+            lastClick = Time.time;
         }
+
         if (isMoving)
         {
             Move();
+        }
+
+        if (isSpeeding)
+        {
+            SpeedUp();
         }
     }
 
@@ -40,14 +65,31 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    //I put this here to try and stop the player from jittering in place, but it only stopped some cases of the jitter
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Environment")
+       if (collision.gameObject == treasure)
         {
-            float step = 0;
-            transform.position = Vector2.MoveTowards(transform.position, transform.position, step);
-            isMoving = false;
+            hasTreasure = true;
+            treasure.SetActive(false);
+        }
+    }
+
+    private void SpeedUp()
+    {
+        if (speedUpTime < speedUpDuration)
+        {
+            if (!hasSpedUp)
+            {
+                speed = speed * 2;
+                hasSpedUp = true;
+            }
+            speedUpTime += Time.fixedDeltaTime;
+        } else
+        {
+            speedUpTime = 0f;
+            speed = speed / 2;
+            isSpeeding = false;
+            hasSpedUp = false;
         }
     }
 }
