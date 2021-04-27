@@ -5,6 +5,7 @@ using UnityEngine;
 public class ExitManager : MonoBehaviour
 {
     public GameObject victoryText;
+    public GameObject player;
 
     void Start()
     {
@@ -16,6 +17,7 @@ public class ExitManager : MonoBehaviour
         if (collision.gameObject.layer == 9)
         {
             victoryText.SetActive(true);
+            player.SetActive(false);
             Application.Quit();
             Debug.Log("Endscreen Quitting");
         }

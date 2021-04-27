@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    public float speed = 10f;
+    public float speed = 5f;
     public float speedUpDuration = 1.5f;
     private float speedUpTime = 0f;
     private bool isSpeeding = false;
@@ -20,6 +20,13 @@ public class PlayerManager : MonoBehaviour
 
     public GameObject treasure;
     private bool hasTreasure = false;
+
+    private Vector3 startPoint;
+
+    void Start()
+    {
+        startPoint = transform.position;
+    }
 
     void FixedUpdate()
     {
@@ -67,10 +74,15 @@ public class PlayerManager : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        isMoving = false;
        if (collision.gameObject == treasure)
         {
+            isMoving = true;
             hasTreasure = true;
             treasure.SetActive(false);
+        } else if (collision.gameObject.layer == 10)
+        {
+            Restart();
         }
     }
 
@@ -90,6 +102,17 @@ public class PlayerManager : MonoBehaviour
             speed = speed / 2;
             isSpeeding = false;
             hasSpedUp = false;
+        }
+    }
+
+    private void Restart()
+    {
+        transform.position = startPoint;
+        isMoving = false;
+        if (hasTreasure)
+        {
+            treasure.SetActive(true);
+            hasTreasure = false;
         }
     }
 }
